@@ -13,4 +13,5 @@ export default registerAs<AppConfig>('app', () => ({
       ? parseInt(process.env.PORT, 10)
       : 3000,
   apiPrefix: process.env.API_PREFIX || 'api',
+  fileLogs: process.env.FILE_LOGS || 'false',
 }));

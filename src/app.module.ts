@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './modules/user/user.module';
 import appConfig from './configs/app.config';
 import { WinstonModule } from 'nest-winston';
+import { LoggerModule } from './modules/logger/logger.module';
 import * as winston from 'winston';
 
 @Module({
@@ -18,6 +19,7 @@ import * as winston from 'winston';
       envFilePath: ['.env'],
     }),
     UserModule,
+    LoggerModule,
   ],
   controllers: [],
   providers: [],
