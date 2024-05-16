@@ -4,6 +4,9 @@ import { UserModule } from './modules/user/user.module';
 import appConfig from './configs/app.config';
 import { WinstonModule } from 'nest-winston';
 import { LoggerModule } from './modules/logger/logger.module';
+import { PrismaModule } from './modules/prisma/prisma.module';
+import { AuthModule } from './modules/auth/auth.module';
+
 import * as winston from 'winston';
 
 @Module({
@@ -20,6 +23,8 @@ import * as winston from 'winston';
     }),
     UserModule,
     LoggerModule,
+    AuthModule,
+    PrismaModule,
   ],
   controllers: [],
   providers: [],

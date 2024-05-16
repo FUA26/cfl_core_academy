@@ -16,7 +16,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
+  // app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
   app.setGlobalPrefix(
     configService.getOrThrow('app.apiPrefix', { infer: true }),
     {

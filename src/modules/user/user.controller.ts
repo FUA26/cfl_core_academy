@@ -15,7 +15,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
-@ApiTags('Auth')
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(
@@ -30,7 +30,6 @@ export class UserController {
 
   @Get()
   findAll() {
-    this.logger.info('Ini Log WinstonModule');
     return this.userService.findAll();
   }
 
