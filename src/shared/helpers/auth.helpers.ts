@@ -17,10 +17,8 @@ const verify = (password: string, hash: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, hash, (err, result) => {
       if (err) {
-        console.error('Verification error:', err);
         reject(err);
       } else {
-        console.log('Verification result:', result);
         resolve(result);
       }
     });

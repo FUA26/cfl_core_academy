@@ -31,6 +31,7 @@ async function bootstrap() {
       'Explore the capabilities of our API with detailed endpoints information, request samples, and response schemas.',
     )
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, options);

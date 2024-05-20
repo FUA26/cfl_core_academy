@@ -7,15 +7,22 @@ import {
   Param,
   Delete,
   Inject,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
+import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
+import { Roles } from 'src/shared/decorators/roles.decorator';
+import { Role } from '@prisma/client';
+import { RolesGuard } from 'src/shared/guards/role.guard';
 
 @ApiTags('User')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(
@@ -28,6 +35,8 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(RolesGuard)
   @Get()
   findAll() {
     return this.userService.findAll();

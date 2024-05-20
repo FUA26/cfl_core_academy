@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { UserService } from '../user/user.service';
 import { User } from '@prisma/client';
@@ -50,6 +50,31 @@ export class AuthService {
       data: Excluder(updatedUser, ['password', 'hashToken']),
       accessToken: token.accessToken,
       refreshToken: token.refreshToken,
+    };
+  }
+
+  async validateRefreshToken(sub, token): Promise<any> {
+    const getUser = await this.userService.validateUserId(sub);
+
+    const isValidToken = await AuthHelpers.verify(token, getUser.hashToken);
+    // const isValidToken = await bcrypt.compare(token, user.hashToken);
+    // console.log(isValidToken);
+
+    if (!isValidToken) {
+      throw new HttpException('Token Expired', HttpStatus.UNAUTHORIZED);
+    }
+
+    const payload = {
+      sub: getUser.id,
+      firstName: getUser.firstName,
+      lastName: getUser.lastName,
+      email: getUser.email,
+      role: getUser.role,
+    };
+
+    const tokens = await this.getJwtToken(payload);
+    return {
+      accessToken: tokens.accessToken,
     };
   }
 

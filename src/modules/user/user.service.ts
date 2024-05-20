@@ -53,7 +53,7 @@ export class UserService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    console.log(password, getUser.password);
+
     const isValidPassword = await AuthHelpers.verify(
       password,
       getUser.password,
@@ -65,6 +65,14 @@ export class UserService {
         HttpStatus.UNAUTHORIZED,
       );
     }
+    return getUser;
+  }
+
+  async validateUserId(sub: string): Promise<User> {
+    const getUser = await this.prisma.user.findFirst({
+      where: { id: sub },
+    });
+
     return getUser;
   }
 
