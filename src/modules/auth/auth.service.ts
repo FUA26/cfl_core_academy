@@ -78,6 +78,15 @@ export class AuthService {
     };
   }
 
+  async removeRefreshToken(sub: string): Promise<User> {
+    return await this.userService.updateUser(
+      { id: sub },
+      {
+        hashToken: null,
+      },
+    );
+  }
+
   private async getJwtToken(user: IJwtPayload): Promise<IJwtToken> {
     const payload = {
       ...user,
@@ -93,14 +102,5 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
-  }
-
-  private async removeRefreshToken(sub: string): Promise<User> {
-    return await this.userService.updateUser(
-      { id: sub },
-      {
-        hashToken: null,
-      },
-    );
   }
 }

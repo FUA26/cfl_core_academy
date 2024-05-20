@@ -63,4 +63,17 @@ export class AuthController {
 
     return res.send({ accessToken: token.accessToken });
   }
+
+  @Post('logout')
+  @UseGuards(JwtRefreshGuard)
+  async logout(@Request() req, @Response() res): Promise<any> {
+    const user = req.user;
+    await this.authService.removeRefreshToken(user.sub);
+    res.clearCookie('RefreshToken', {
+      httpOnly: true,
+      maxAge: 0,
+    });
+
+    return res.status(200).send({ message: 'Logout successful' });
+  }
 }
