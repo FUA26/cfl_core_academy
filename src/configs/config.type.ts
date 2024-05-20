@@ -9,6 +9,13 @@ export type AppConfig = {
   fileLogs: string;
 };
 
+export type AuthConfig = {
+  secret?: string;
+  expires?: string;
+  refresh_exp?: string;
+};
+
 export type AllConfigType = {
   app: AppConfig;
+  auth: AuthConfig;
 };

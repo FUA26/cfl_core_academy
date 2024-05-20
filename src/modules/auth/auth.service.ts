@@ -1,15 +1,81 @@
 import { Injectable } from '@nestjs/common';
-import { AuthRegisterLoginDto } from './dto/register-auth.dto';
+import { RegisterAuthDto } from './dto/register-auth.dto';
 import { UserService } from '../user/user.service';
 import { User } from '@prisma/client';
-
+import { LoginAuthDto } from './dto/login-auth.dto';
+import { AuthHelpers } from 'src/shared/helpers/auth.helpers';
+import { Excluder } from 'src/shared/helpers/excluder.helpers';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { IJwtPayload, IJwtToken } from 'src/shared/types/auth.types';
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
 
   async register(
-    createDto: AuthRegisterLoginDto,
+    createDto: RegisterAuthDto,
   ): Promise<Omit<User, 'password' | 'hashToken'>> {
     return await this.userService.createUser(createDto);
+  }
+
+  async validateLogin(loginDto: LoginAuthDto) {
+    const user = await this.userService.validateUser(
+      loginDto.email,
+      loginDto.password,
+    );
+
+    const payload = {
+      sub: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+    };
+
+    const token = await this.getJwtToken(payload);
+    const hashedToken = await AuthHelpers.hash(token.refreshToken);
+    const updatedUser = await this.userService.updateUser(
+      {
+        id: user.id,
+      },
+      {
+        hashToken: hashedToken,
+      },
+    );
+    return {
+      data: Excluder(updatedUser, ['password', 'hashToken']),
+      accessToken: token.accessToken,
+      refreshToken: token.refreshToken,
+    };
+  }
+
+  private async getJwtToken(user: IJwtPayload): Promise<IJwtToken> {
+    const payload = {
+      ...user,
+    };
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.sign(payload),
+      this.jwtService.sign(payload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: this.configService.get('auth.refresh_exp'),
+      }),
+    ]);
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  private async removeRefreshToken(sub: string): Promise<User> {
+    return await this.userService.updateUser(
+      { id: sub },
+      {
+        hashToken: null,
+      },
+    );
   }
 }

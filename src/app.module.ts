@@ -8,6 +8,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 
 import * as winston from 'winston';
+import authConfig from './configs/auth.config';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import * as winston from 'winston';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig],
+      load: [appConfig, authConfig],
       envFilePath: ['.env'],
     }),
     UserModule,

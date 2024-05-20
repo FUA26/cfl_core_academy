@@ -27,7 +27,7 @@ export class UserService {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
     }
 
-    const encryptedPass = await AuthHelpers.hash('sadsadasd');
+    const encryptedPass = await AuthHelpers.hash(data.password);
 
     const user = await this.prisma.user.create({
       data: {
@@ -40,6 +40,47 @@ export class UserService {
     });
     const clientClean = Excluder(user, ['password', 'hashToken']);
     return clientClean;
+  }
+
+  async validateUser(email: string, password: string): Promise<any> {
+    const getUser = await this.prisma.user.findFirst({
+      where: { email },
+    });
+
+    if (!getUser) {
+      throw new HttpException(
+        'Email and Password Do Not Match',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    console.log(password, getUser.password);
+    const isValidPassword = await AuthHelpers.verify(
+      password,
+      getUser.password,
+    );
+
+    if (!isValidPassword) {
+      throw new HttpException(
+        'Email and Password Do Not Match',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    return getUser;
+  }
+
+  async updateUser(
+    where: Prisma.UserWhereUniqueInput,
+    data: Prisma.UserUpdateInput,
+  ): Promise<User> {
+    try {
+      const updatedUser = await this.prisma.user.update({
+        where,
+        data,
+      });
+      return updatedUser;
+    } catch (error) {
+      throw new Error(`Could not update user: ${error.message}`);
+    }
   }
 
   create(createUserDto: CreateUserDto) {

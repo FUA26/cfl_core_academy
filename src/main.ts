@@ -1,22 +1,23 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { AllConfigType } from './configs/config.type';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { AllExceptionsFilter } from './filters/all.exception.filter';
+
+import * as cookieParser from 'cookie-parser';
+import validationOptions from './configs/pipes.option';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService) as ConfigService<AllConfigType>;
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
-  // app.useGlobalFilters(new AllExceptionsFilter(app.get(HttpAdapterHost)));
+  app.use(cookieParser());
+  app.enableCors({
+    origin: true,
+    methods: 'GET,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+  app.useGlobalPipes(new ValidationPipe(validationOptions));
   app.setGlobalPrefix(
     configService.getOrThrow('app.apiPrefix', { infer: true }),
     {
