@@ -14,17 +14,79 @@ datasource db {
 }
 
 model User {
-  id          String    @id @default(uuid())
+  id          String      @id @default(uuid())
   firstName   String
   lastName    String
   email       String
   password    String?
   hashToken   String?
-  role        Role      @default(USER)
+  isVerified  Boolean     @default(false)
+  role        Role        @default(USER)
   phoneNumber String?
-  status      Int       @default(1)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime?
+  status      Int         @default(1)
+  courses     String?
+  questions   Questions[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime?   @updatedAt
+}
+
+model Course {
+  id             String       @id @default(uuid())
+  name           String
+  description    String
+  categories     String
+  price          Int
+  estimatedPrice Int?
+  thumbnail      String
+  tags           String
+  level          String
+  demoUrl        String
+  benefits       String
+  prerequisites  String
+  reviews        Review[]
+  courseData     CourseData[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime?    @updatedAt
+}
+
+model Review {
+  id             Int       @id @default(autoincrement())
+  userId         Int
+  rating         Int       @default(0)
+  comment        String
+  commentReplies Json?
+  course         Course    @relation(fields: [courseId], references: [id])
+  courseId       String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime? @updatedAt
+}
+
+model CourseData {
+  id             String      @id @default(uuid())
+  title          String
+  description    String
+  videoUrl       String
+  videoThumbnail String
+  videoSection   String
+  videoLength    Int
+  videoPlayer    String
+  links          String
+  course         Course      @relation(fields: [id], references: [id])
+  questions      Questions[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime?   @updatedAt
+}
+
+model Questions {
+  id              Int        @id @default(autoincrement())
+  userId          String
+  question        String
+  questionReplies Json?
+  courseDataId    String
+  courseData      CourseData @relation(fields: [courseDataId], references: [id])
+  User            User       @relation(fields: [userId], references: [id])
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime?  @updatedAt
 }
 
 enum Role {
