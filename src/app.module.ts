@@ -8,6 +8,8 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CourseModule } from './modules/course/course.module';
 import { ReviewModule } from './modules/review/review.module';
+import { CourseDataModule } from './modules/course-data/course-data.module';
+import { QuestionsModule } from './modules/questions/questions.module';
 
 import * as winston from 'winston';
 import authConfig from './configs/auth.config';
@@ -30,6 +32,8 @@ import authConfig from './configs/auth.config';
     PrismaModule,
     CourseModule,
     ReviewModule,
+    CourseDataModule,
+    QuestionsModule,
   ],
   controllers: [],
   providers: [],

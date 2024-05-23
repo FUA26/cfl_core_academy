@@ -70,22 +70,25 @@ model CourseData {
   videoLength    Int
   videoPlayer    String
   links          String
-  course         Course      @relation(fields: [id], references: [id])
+  courseId       String
+  course         Course      @relation(fields: [courseId], references: [id])
   questions      Questions[]
   createdAt      DateTime    @default(now())
   updatedAt      DateTime?   @updatedAt
 }
 
 model Questions {
-  id              Int        @id @default(autoincrement())
-  userId          String
-  question        String
-  questionReplies Json?
-  courseDataId    String
-  courseData      CourseData @relation(fields: [courseDataId], references: [id])
-  User            User       @relation(fields: [userId], references: [id])
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime?  @updatedAt
+  id               Int         @id @default(autoincrement())
+  userId           String
+  question         String
+  questionReplies  Questions[] @relation("QuestionReplies")
+  parentQuestionId Int? // Nullable foreign key for the self-reference
+  parentQuestion   Questions?  @relation("QuestionReplies", fields: [parentQuestionId], references: [id])
+  courseDataId     String
+  courseData       CourseData  @relation(fields: [courseDataId], references: [id])
+  User             User        @relation(fields: [userId], references: [id])
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime?   @updatedAt
 }
 
 enum Role {
